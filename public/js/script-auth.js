@@ -4,6 +4,7 @@ const configPage = "http://localhost/EnergySaveProject/device-settings";
 const homePage = "http://localhost/EnergySaveProject/home";
 
 let givenEmail, givenPassword, givenName;
+window.twofaEmailType = "cadastro";
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const sideSignupBtn      = document.getElementById('sideSignupBtn');
     const forgotPasswordBtn  = document.getElementById('forgotPasswordSubmit');
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const passkeyBtn         = document.getElementById('passkeySignIn');
     const backFromRemember   = document.getElementById('backFromRemember');
     const backFrom2fa        = document.getElementById('backFrom2fa');
 
@@ -98,6 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             cadastro = true;
         }
 
+        const authType = card.classList.contains('signupActive') ? 'cadastro' : '2fa';
+        window.twofaEmailType = authType;
+
         const payload = JSON.stringify({ 
             token: token,   
             "loginType": 1,         
@@ -107,10 +112,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const resp = await request(REQUEST_URL + "/google", "POST", { body: payload });
         console.log(resp);
         
+        if (resp?.["2fa"] || resp?.data?.to === "/2fa") {
+            window.givenEmail = resp?.data?.email || window.givenEmail;
+            window.open2FA(window.givenEmail);
+            return;
+        }
+
         if (resp?.data?.changeLocation) {
             window.location.href = configPage;
+            return;
         } 
-        else if (resp) {
+        
+        if (resp) {
             alert(resp.message || "Erro inesperado.");
         }
         
@@ -161,6 +174,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("a");
     })
 
+    passkeyBtn?.addEventListener('click', () => {
+        loginPasskey();
+    });
+
     backFromRemember?.addEventListener('click', () => switchTo('loginActive'));
     backFrom2fa?.addEventListener('click', () => switchTo('loginActive'));
 
@@ -170,7 +187,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //  Uso: window.open2FA('joao@email.com')
     // ============================================================
 
-    window.open2FA = function (email) {
+    window.open2FA = function (email, type = window.twofaEmailType || "cadastro") {
+        window.twofaEmailType = type;
         const hint = document.getElementById('twofaEmailHint');
         if (hint) {
             const [user, domain] = email.split('@');
@@ -379,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const payload = JSON.stringify({ 
                 email: window.givenEmail,
-                emailType: "cadastro"
+                emailType: window.twofaEmailType || "cadastro"
             }) ;
 
             const res = await request(REQUEST_URL + "/resend-code", "POST", { body: payload });
@@ -420,17 +438,24 @@ async function sendRequest(type, form = null, extra = null){
 
     switch(type){
         case "login":
+            window.givenEmail = formData.get("email");
+            window.givenPassword = formData.get("password");
+            window.twofaEmailType = "2fa";
+            window.twofaRemember = formData.get("remember") === "on";
+
             url = REQUEST_URL + "/login";
             payload = JSON.stringify({ 
                 loginType: 2, 
-                email: formData.get("email"),
-                password: formData.get("password"),
-                remember: formData.get("remember") === "on",
+                email: window.givenEmail,
+                password: window.givenPassword,
+                remember: window.twofaRemember,
                 cadastro: false
             });
             break;
 
         case "cadastro":
+            window.twofaEmailType = "cadastro";
+            window.twofaRemember = false;
             url = REQUEST_URL + "/signup";
             payload = JSON.stringify({ 
                 loginType: 2,
@@ -454,14 +479,13 @@ async function sendRequest(type, form = null, extra = null){
         case "twofaActive":
             url = REQUEST_URL + "/src/api/services/auth/VerifyEmailCodeService.php";
             payload = JSON.stringify({ 
-                type: "validate",
                 userCode: extra,
                 email: window.givenEmail,
                 password: window.givenPassword,
-                name: window.givenName
-            }) 
-            console.log(payload);
-            console.log(`${window.givenEmail} | ${window.givenPassword} | ${window.givenName}`);
+                name: window.givenName,
+                emailType: window.twofaEmailType,
+                remember: window.twofaRemember || false
+            });
             break;
 
         default:
@@ -481,6 +505,12 @@ async function sendRequest(type, form = null, extra = null){
         return res;
     }
 
+    if (res?.["2fa"] || res?.data?.to === "/2fa") {
+        window.givenEmail = res?.data?.email || window.givenEmail;
+        window.open2FA(window.givenEmail);
+        return res;
+    }
+
     if (res?.data?.changeLocation && type === "login") {
         window.location.href = configPage;
         return res;
@@ -492,4 +522,28 @@ async function sendRequest(type, form = null, extra = null){
     }
     
     return res;
+}
+
+async function loginPasskey() {
+
+    const options = await request(
+        REQUEST_URL + "/passkey-challenge"
+    );
+
+    const challenge = Uint8Array.from(
+        atob(options.challenge),
+        c => c.charCodeAt(0)
+    );
+
+    const assertion = await navigator.credentials.get({
+        mediation: "optional",
+        publicKey: {
+            challenge,
+            userVerification: "preferred",
+            timeout: 60000,
+            rpId: window.location.hostname
+        }
+    });
+
+    console.log(assertion);
 }

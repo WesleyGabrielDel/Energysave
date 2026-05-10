@@ -96,9 +96,19 @@
             );
 
             $senhaBanco = $row["senha"];
-            valueVerification($senhaBanco);
+
+            if(!$senhaBanco){
+                $mysqli->close();
+
+                return [
+                    "success" => false,
+                    "message" => "Esta conta utiliza login com Google. Entre com o Google para continuar.",
+                    "action" => "SHOW_ERROR",
+                    "data" => null
+                ];                
+            }
             
-            // Verifica se a senha fornecida corresponde à senha armazenada usando password_verify. Se corresponder, o login é bem-sucedido e retorna um array de sucesso. Caso contrário, retorna um array de erro de credenciais inválidas.
+            // Verifica se a senha fornecida corresponde à senha armazenada usando password_verify. 
             if (password_verify($password, $senhaBanco)) {
                 
                 if(UserSessions::isLoggedIn()){

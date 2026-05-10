@@ -116,19 +116,37 @@
                 ];
             }
 
+            $user_config = UserRepository::getUserConfig($mysqli, null, $user["email"]);
             $mysqli->close();
 
-            return [
-                "success" => true,
-                "message" => "Login pelo google efetuado com sucesso!",
-                "action" => "REDIRECT",
-                "data" => [
-                    "to" => "/home",
-                    "login" => true,
-                    "email" => $user["email"],
-                    "changeLocation" => true
-                ]
-            ];
+            // Se o usuário está com o 2fa ligado ele não loga e é direcionado a página de 2fa
+            if(!(bool) $user_config["two_factor_enabled"]){
+                return [
+                    "success" => true,
+                    "message" => "Login pelo google efetuado com sucesso!",
+                    "action" => "REDIRECT",
+                    "data" => [
+                        "to" => "/home",
+                        "login" => true,
+                        "email" => $user["email"],
+                        "changeLocation" => true
+                    ]
+                ];
+            }
+
+            else {
+                return [
+                    "success" => true,
+                    "message" => "2fa está ativo para esta conta!",
+                    "2fa" => $user_config["two_factor_enabled"],
+                    "action" => "REDIRECT",
+                    "data" => [
+                        "to" => "/2fa",
+                        "email" => $user["email"]
+                    ]
+                ];                   
+            }
+
         }
 
         private function createAccount(mixed $user) {

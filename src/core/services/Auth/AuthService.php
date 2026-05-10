@@ -34,8 +34,10 @@
             else if(isset($res["2fa"])){
                 $mysqli = Database::connect();
 
-                $code = TwoFactorAuthService::createCode($mysqli, $data["email"]);
-                EmailSender::sendEmail($mysqli, $data["email"], ["type" => "2fa", "code" => $code]);  
+                if(TwoFactorAuthService::needsNewCode($data["email"], $mysqli)){
+                    $code = TwoFactorAuthService::createCode($mysqli, $data["email"]);
+                    EmailSender::sendEmail($mysqli, $data["email"], ["type" => "2fa", "code" => $code]);
+                }
 
             }
 
@@ -75,6 +77,16 @@
                 $tokenData = SessionService::createSessionCookie(true, false, $userId["id"], [], true);
 
                 UserSessions::saveSession($userId["id"], $tokenData["token_id"]);
+            }
+
+            else if(isset($res["2fa"])){
+                $mysqli = Database::connect();
+
+                if(TwoFactorAuthService::needsNewCode($res["data"]["email"], $mysqli)){
+                    $code = TwoFactorAuthService::createCode($mysqli, $res["data"]["email"]);
+                    EmailSender::sendEmail($mysqli, $res["data"]["email"], ["type" => "2fa", "code" => $code]);
+                }
+
             }
 
             return $res;

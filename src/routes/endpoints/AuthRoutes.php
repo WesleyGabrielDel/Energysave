@@ -39,3 +39,10 @@ $router->post('/resend-code', function(){
 
     echo json_encode($status);
 });
+
+$router->get('/passkey-challenge', function(){
+    $challenge = random_bytes(32);
+    echo json_encode([
+        'challenge' => base64_encode($challenge)
+    ]);
+});

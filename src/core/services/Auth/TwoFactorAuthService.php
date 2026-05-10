@@ -67,4 +67,32 @@
             ];
         }
 
+        public static function needsNewCode(string $email, mysqli $mysqli){
+            $code_row = Database::query(
+                $mysqli,
+                "SELECT codigo, time_exp FROM email_codes WHERE email = ?",
+                true,
+                "s",
+                [$email]
+            );
+
+            if(empty($code_row)){
+                return true;
+            }
+
+            if ($code_row["time_exp"] < time()) {
+                Database::query(
+                    $mysqli,
+                    "DELETE FROM email_codes WHERE email = ?",
+                    false,
+                    "s",
+                    [$email]
+                );
+
+                return true;
+            }
+
+            return false;
+        }
+
     }
