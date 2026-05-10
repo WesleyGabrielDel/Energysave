@@ -1,0 +1,684 @@
+:root {
+    --primaria: #3b82f6;
+    --primaria1: #72b0fc;
+    --primaria2: #b2d5ff;
+    --fundo: #0a0a0a;
+    --secundaria: #1e1e1e;
+    --warning: #db5643;
+    --success: #22c55e;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    color: #fff;
+}
+
+/* ===================== LAYOUT PRINCIPAL ===================== */
+
+.container {
+    width: 100%;
+    height: 100vh;
+    background-color: var(--fundo);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    width: 80%;
+    height: 85vh;
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 60% 50%, #72b0fc 0%, #b2d5ff 100%);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);
+}
+
+.panel-dark {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: var(--secundaria);
+    border-radius: 30px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: left 0.6s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.panel-light {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: left 0.6s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.panel-remember {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--secundaria);
+    border-radius: 30px;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.panel-twofa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--secundaria);
+    border-radius: 30px;
+    z-index: 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+/* Posicionamento por estado */
+.card.loginActive  .panel-dark  { left: 0; }
+.card.loginActive  .panel-light { left: 50%; }
+.card.signupActive .panel-dark  { left: 50%; }
+.card.signupActive .panel-light { left: 0; }
+.card.rememberActive .panel-remember { opacity: 1; pointer-events: auto; }
+.card.twofaActive .panel-twofa { opacity: 1; pointer-events: auto; }
+
+/* ===================== CONTEÚDO DOS PAINÉIS ===================== */
+
+.formLogin,
+.formSignup {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 40px 40px;
+}
+
+.contentLogin,
+.contentSignup {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 40px 40px;
+}
+
+.contentRemember {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 40px 40px;
+    gap: 20px;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+    }
+}
+
+.card.loginActive  .formLogin     { display: flex; }
+.card.loginActive  .formSignup    { display: none;  }
+.card.loginActive  .contentSignup { display: flex; }
+.card.loginActive  .contentLogin  { display: none;  }
+
+.card.signupActive .formSignup    { display: flex; }
+.card.signupActive .formLogin     { display: none;  }
+.card.signupActive .contentLogin  { display: flex; }
+.card.signupActive .contentSignup { display: none;  }
+
+/* ===================== TIPOGRAFIA ===================== */
+
+.panel-dark h2,
+.panel-remember h2,
+.panel-twofa h2 {
+    color: #fff;
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.panel-light h2 {
+    color: #000;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+.panel-light p {
+    color: rgba(0, 0, 0, 0.65);
+    text-align: center;
+    margin-bottom: 28px;
+    font-size: 15px;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.panel-remember label {
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    margin-bottom: 28px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* ===================== INPUTS ===================== */
+
+.panel-dark form,
+.panel-remember form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    align-items: center;
+}
+
+.panel-dark input[type="text"],
+.panel-dark input[type="email"],
+.panel-dark input[type="password"],
+.panel-remember input[type="email"] {
+    padding: 13px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    outline: none;
+    font-size: 15px;
+    width: 100%;
+    max-width: 380px;
+    background-color: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.9);
+    transition: border 0.2s, background 0.2s;
+}
+
+.panel-dark input[type="text"]::placeholder,
+.panel-dark input[type="email"]::placeholder,
+.panel-dark input[type="password"]::placeholder,
+.panel-remember input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.panel-dark input[type="text"]:focus,
+.panel-dark input[type="email"]:focus,
+.panel-dark input[type="password"]:focus,
+.panel-remember input[type="email"]:focus {
+    border-color: var(--primaria1);
+    background-color: rgba(255, 255, 255, 0.11);
+}
+
+/* ===================== BOTÕES ===================== */
+
+.panel-dark button[type="submit"],
+.panel-remember button[type="submit"] {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    width: 100%;
+    max-width: 380px;
+    cursor: pointer;
+    margin-top: 4px;
+    background: linear-gradient(90deg, var(--primaria) 0%, var(--primaria1) 75%, var(--primaria2) 100%);
+    color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.panel-dark button[type="submit"]:hover,
+.panel-remember button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(59, 130, 246, 0.5);
+}
+
+#sideLoginBtn,
+#sideSignupBtn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: 2.5px solid rgba(0, 0, 0, 0.2);
+    font-size: 15px;
+    font-weight: 700;
+    width: 100%;
+    max-width: 300px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.35);
+    color: rgba(0, 0, 0, 0.8);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+#sideLoginBtn:hover,
+#sideSignupBtn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+    background-color: rgba(255, 255, 255, 0.55);
+}
+
+.social-btn {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 11px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.85);
+    flex: 1;
+    transition: all 0.2s;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.13);
+}
+
+/* ===================== EXTRAS ===================== */
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 380px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--primaria1);
+}
+
+.checkbox-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.forgot-link {
+    font-size: 13px;
+    color: var(--primaria1);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: var(--primaria2);
+}
+
+.back-link {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ctnOtherLogins,
+.ctnOtherSignups {
+    margin-top: 18px;
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+}
+
+.ctnOtherLogins > p,
+.ctnOtherSignups > p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.38);
+    margin-bottom: 10px;
+}
+
+.otherLogins,
+.otherSignups {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* ===================== PAINEL 2FA ===================== */
+
+.content2fa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+    max-width: 440px;
+    padding: 40px 32px;
+}
+
+/* Cabeçalho do 2FA */
+.twofa-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.twofa-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(114, 176, 252, 0.15) 100%);
+    border: 1px solid rgba(114, 176, 252, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.twofa-icon i {
+    font-size: 28px;
+    color: var(--primaria1);
+}
+
+/* Sobrescreve o margin-bottom genérico do h2 dentro do 2FA */
+.twofa-header h2 {
+    margin-bottom: 0 !important;
+    font-size: 26px !important;
+}
+
+.twofa-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+    max-width: 320px;
+}
+
+.twofa-desc span {
+    color: var(--primaria1);
+    font-weight: 500;
+}
+
+/* Formulário do 2FA */
+#twofaForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+/* ===== CAMPOS OTP ===== */
+
+.otp-fields {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.otp-fields input {
+    width: 54px;
+    height: 64px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    border-radius: 14px;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    outline: none;
+    caret-color: transparent;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    /* Desabilita o comportamento padrão de number inputs */
+    -moz-appearance: textfield;
+}
+
+.otp-fields input::-webkit-outer-spin-button,
+.otp-fields input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+/* Foco */
+.otp-fields input:focus {
+    border-color: var(--primaria1);
+    background-color: rgba(114, 176, 252, 0.1);
+    box-shadow: 0 0 0 3px rgba(114, 176, 252, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Preenchido */
+.otp-fields input.otp-filled {
+    border-color: rgba(114, 176, 252, 0.4);
+    background-color: rgba(114, 176, 252, 0.08);
+}
+
+/* Erro */
+.otp-fields input.otp-error {
+    border-color: var(--warning);
+    background-color: rgba(219, 86, 67, 0.1);
+    box-shadow: 0 0 0 3px rgba(219, 86, 67, 0.15);
+    animation: otpShake 0.4s ease;
+}
+
+/* Sucesso */
+.otp-fields input.otp-success {
+    border-color: var(--success);
+    background-color: rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+@keyframes otpShake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-5px); }
+    40%       { transform: translateX(5px); }
+    60%       { transform: translateX(-3px); }
+    80%       { transform: translateX(3px); }
+}
+
+/* Linha de status (erro / info) */
+.otp-status {
+    font-size: 13px;
+    min-height: 18px;
+    text-align: center;
+    transition: opacity 0.2s;
+}
+
+.otp-status.is-error   { color: var(--warning); }
+.otp-status.is-success { color: var(--success); }
+.otp-status.is-info    { color: var(--primaria1); }
+
+/* Botão de verificar */
+.twofa-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    width: 100%;
+    max-width: 340px;
+    cursor: pointer;
+    background: linear-gradient(90deg, var(--primaria) 0%, var(--primaria1) 75%, var(--primaria2) 100%);
+    color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.twofa-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(59, 130, 246, 0.5);
+}
+
+.twofa-submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Rodapé do 2FA */
+.twofa-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.twofa-separator {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 16px;
+}
+
+/* Botão reenviar */
+.twofa-resend-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0;
+}
+
+.twofa-resend-btn:hover:not(:disabled) {
+    color: var(--primaria1);
+}
+
+.twofa-resend-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Countdown do reenvio */
+.resend-countdown {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ===================== ANIMAÇÕES DE TROCA ===================== */
+
+.card.loginActive.animating .formLogin {
+    animation: slideInFromLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card.loginActive.animating .contentSignup {
+    animation: slideInFromRight 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card.signupActive.animating .formSignup {
+    animation: slideInFromRight 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card.signupActive.animating .contentLogin {
+    animation: slideInFromLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger nos filhos dos formulários */
+.card.animating .formLogin > *,
+.card.animating .formSignup > * {
+    opacity: 0;
+    animation: fadeInUp 0.32s ease-out forwards;
+}
+
+.card.animating .formLogin > *:nth-child(1),
+.card.animating .formSignup > *:nth-child(1) { animation-delay: 0.10s; }
+.card.animating .formLogin > *:nth-child(2),
+.card.animating .formSignup > *:nth-child(2) { animation-delay: 0.18s; }
+.card.animating .formLogin > *:nth-child(3),
+.card.animating .formSignup > *:nth-child(3) { animation-delay: 0.26s; }
+.card.animating .formLogin > *:nth-child(4),
+.card.animating .formSignup > *:nth-child(4) { animation-delay: 0.34s; }
+.card.animating .formLogin > *:nth-child(5),
+.card.animating .formSignup > *:nth-child(5) { animation-delay: 0.42s; }
+
+/* Stagger no painel claro */
+.card.animating .contentLogin > *,
+.card.animating .contentSignup > * {
+    opacity: 0;
+    animation: fadeInUp 0.32s ease-out forwards;
+}
+
+.card.animating .contentLogin > *:nth-child(1),
+.card.animating .contentSignup > *:nth-child(1) { animation-delay: 0.12s; }
+.card.animating .contentLogin > *:nth-child(2),
+.card.animating .contentSignup > *:nth-child(2) { animation-delay: 0.22s; }
+.card.animating .contentLogin > *:nth-child(3),
+.card.animating .contentSignup > *:nth-child(3) { animation-delay: 0.32s; }
+
+/* Animação inicial */
+.card.init-anim .panel-dark  { animation: fadeInUp 0.5s ease-out both; }
+.card.init-anim .panel-light { animation: fadeInUp 0.5s ease-out 0.1s both; }
+
+/* ===================== KEYFRAMES ===================== */
+
+@keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-36px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(36px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes opacityAnIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes opacityAnOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
